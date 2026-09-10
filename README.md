@@ -1,4 +1,4 @@
-# #54. JavaScript Homework — Async File Operations
+# #55. JavaScript Homework — Async File Operations
 
 Реалізація трьох функцій для асинхронної роботи з файлами через `fs/promises` у Node.js.
 
