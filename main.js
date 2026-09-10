@@ -1,151 +1,160 @@
-console.log('#53. JavaScript homework example file');
+import { writeFile, readFile, unlink } from 'fs/promises';
+
+console.log('#54. JavaScript homework example file');
 
 /*
- * #1 — isDebugMode
- * У браузері немає process.env, тому за замовчуванням NODE_ENV не існує —
- * функція просто завжди повертатиме false, якщо не задати змінну вручну.
+ *
+ * #1
+ *
+ * Технічне завдання для розробки функції "writeFileAsync"
+ *
+ * Задача:
+ * Розробити функцію для асинхронного запису даних у файл, використовуючи асинхронні API Node.js.
+ * Функція має забезпечити запис вмісту до файлу і документування процесу через систематичне логування успішних записів та помилок.
+ *
+ * Функціональні вимоги:
+ * 1. Вхідні параметри:
+ *  - `filename`: Ім'я файлу, в який буде здійснено запис.
+ *  - `content`: Вміст, який необхідно записати в файл.
+ *
+ * 2. Операції з файлами:
+ *  - Використання функції `writeFileAsync(filename, content)`: асинхронний запис вмісту в файл за допомогою засобів Node.js.
+ *
+ * 3. Логування:
+ *  - Логування повідомлення "Файл успішно записано" у випадку успішного запису:
+ *     console.log('Файл успішно записано')
+ *  - Логування помилок у консоль у випадку виникнення помилок при записі файлу:
+ *     console.error('Помилка при записі файлу:', error)
+ *
+ * Технічні вимоги:
+ * - Використання сучасних можливостей JavaScript (ES6+), зокрема асинхронних функцій (async/await).
+ * - Належне управління помилками та виключеннями для гарантування стійкості функціоналу.
+ * - Код має бути чистим, добре структурованим, із зрозумілими назвами змінних та функцій.
+ * - Підготовка функції для легкої інтеграції у тести, наприклад, використовуючи JEST для мокування залежностей і перевірки поведінки функції.
+ *
  */
-const isDebugMode = () => {
-  const currentEnv = typeof process !== 'undefined' ? process.env.NODE_ENV : undefined;
-  console.log('Current NODE_ENV:', currentEnv);
 
-  const result = currentEnv === 'development';
-  console.log('isDebugMode result:', result);
+async function writeFileAsync(filename, content) {
+  try {
+    await writeFile(filename, content, 'utf-8');
+    console.log('Файл успішно записано');
+  } catch (error) {
+    console.error('Помилка при записі файлу:', error);
+    throw error;
+  }
+}
 
-  return result;
-};
+// ! Приклад використання:
+// writeFileAsync('example.txt', 'Привіт, це тестовий файл!')
 
 /*
- * #2 — encode / decode (Base64 через btoa/atob, Hex вручну через TextEncoder/TextDecoder)
+ *
+ * #2
+ *
+ * Технічне завдання для розробки функції "readFileAsync"
+ *
+ * Задача:
+ * Розробити функцію для асинхронного читання вмісту файлу, яка використовує Node.js API.
+ * Функція має забезпечувати чітке логування процесу читання, включаючи успішне читання вмісту файлу та обробку помилок, таких як відсутність файлу.
+ *
+ * Функціональні вимоги:
+ * 1. Вхідні параметри:
+ *  - `filename`: Ім'я файлу, з якого буде здійснено читання.
+ *
+ * 2. Операції з файлами:
+ *  - Використання функції `readFileAsync(filename)`: асинхронне читання вмісту файлу за допомогою засобів Node.js.
+ *
+ * 3. Логування:
+ *  - Логування повідомлення "Файл успішно прочитано" у випадку успішного читання:
+ *     console.log('Файл успішно прочитано:', content)
+ *  - Логування помилок у консоль у випадку виникнення помилок при читанні файлу:
+ *     console.error('Помилка при читанні файлу:', error)
+ *  - Специфічна обробка помилки, коли файл не існує:
+ *     console.error('Файл не існує:', filename)
+ *
+ * Технічні вимоги:
+ * - Використання сучасних можливостей JavaScript (ES6+), зокрема асинхронних функцій (async/await).
+ * - Належне управління помилками та виключеннями для гарантування стійкості функціоналу.
+ * - Код має бути чистим, добре структурованим, із зрозумілими назвами змінних та функцій.
+ * - Підготовка функції для легкої інтеграції у тести, наприклад, використовуючи JEST для мокування залежностей і перевірки поведінки функції.
+ *
  */
-function encodeToBase64(...args) {
-  console.log('encodeToBase64 input:', args);
+
+async function readFileAsync(filename) {
   try {
-    const joined = args.join(':');
-    const encoded = btoa(unescape(encodeURIComponent(joined)));
-    console.log('Base64 encoded result:', encoded);
-    return encoded;
+    const content = await readFile(filename, 'utf-8');
+    console.log('Файл успішно прочитано:', content);
+    return content;
   } catch (error) {
-    console.error('Error encoding to Base64:', error.message);
+    if (error.code === 'ENOENT') {
+      console.error('Файл не існує:', filename);
+    } else {
+      console.error('Помилка при читанні файлу:', error);
+    }
     throw error;
   }
 }
 
-function encodeToHex(...args) {
-  console.log('encodeToHex input:', args);
-  try {
-    const joined = args.join(':');
-    const encoded = Array.from(new TextEncoder().encode(joined))
-      .map((byte) => byte.toString(16).padStart(2, '0'))
-      .join('');
-    console.log('Hex encoded result:', encoded);
-    return encoded;
-  } catch (error) {
-    console.error('Error encoding to Hex:', error.message);
-    throw error;
-  }
-}
-
-function decodeFromBase64(base64String) {
-  console.log('decodeFromBase64 input:', base64String);
-  try {
-    const decoded = decodeURIComponent(escape(atob(base64String)));
-    console.log('Base64 decoded result:', decoded);
-    return decoded;
-  } catch (error) {
-    console.error('Error decoding from Base64:', error.message);
-    throw error;
-  }
-}
-
-function decodeFromHex(hexString) {
-  console.log('decodeFromHex input:', hexString);
-  try {
-    const bytes = hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16));
-    const decoded = new TextDecoder().decode(new Uint8Array(bytes));
-    console.log('Hex decoded result:', decoded);
-    return decoded;
-  } catch (error) {
-    console.error('Error decoding from Hex:', error.message);
-    throw error;
-  }
-}
+// ! Приклад використання:
+// readFileAsync('example.txt')
+//   .then((content) => {
+//     console.log('Прочитаний вміст:', content)
+//   })
+//   .catch((error) => {
+//     console.error('Помилка:', error)
+//   })
 
 /*
- * #3 — safe decode з валідацією вхідних рядків
+ *
+ * #3
+ *
+ * Технічне завдання для розробки функції "deleteFileAsync"
+ *
+ * Задача:
+ * Розробити функцію, яка забезпечує асинхронне видалення файлу, використовуючи функції з модуля `fs/promises` у Node.js.
+ * Функція має правильно обробляти як успішне видалення, так і помилки, включаючи сценарії, коли файл не існує.
+ * Функція має забезпечувати чітке логування процесу видалення для спрощення відстеження дій та потенційних помилок у роботі з файлами.
+ *
+ * Функціональні вимоги:
+ * 1. Вхідні параметри:
+ *  - `filename`: Ім'я файлу, який потрібно видалити.
+ *
+ * 2. Операції з файлами:
+ *  - Використання функції `deleteFileAsync(filename)`: асинхронне видалення файлу за допомогою засобів Node.js з використанням функції `unlink` з модуля `fs/promises`.
+ *
+ * 3. Логування:
+ *  - Логування повідомлення "Файл успішно видалено" у випадку успішного видалення:
+ *     console.log('Файл успішно видалено')
+ *  - Логування помилок у консоль у випадку виникнення помилок при видаленні файлу:
+ *     console.error('Помилка при видаленні файлу:', error)
+ *  - Специфічна обробка помилки, коли файл не існує:
+ *     console.error('Файл не існує:', filename)
+ *
+ * Технічні вимоги:
+ * - Використання сучасних можливостей JavaScript (ES6+), зокрема асинхронних функцій (async/await).
+ * - Належне управління помилками та виключеннями для гарантування стійкості функціоналу.
+ * - Код має бути чистим, добре структурованим, із зрозумілими назвами змінних та функцій.
+ * - Підготовка функції для легкої інтеграції у тести, наприклад, використовуючи JEST для мокування залежностей і перевірки поведінки функції.
+ *
  */
-function safeDecodeFromBase64(base64String) {
-  const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/;
 
-  if (typeof base64String !== 'string' || base64String.length === 0 || !base64Regex.test(base64String)) {
-    console.error('Invalid base64 string');
-    throw new Error('Invalid base64 string');
-  }
-
+async function deleteFileAsync(filename) {
   try {
-    const decoded = decodeFromBase64(base64String);
-    console.log('Safe Base64 decoded result:', decoded);
-    return decoded;
+    await unlink(filename);
+    console.log('Файл успішно видалено');
   } catch (error) {
-    console.error('Invalid base64 string');
-    throw new Error('Invalid base64 string');
+    if (error.code === 'ENOENT') {
+      console.error('Файл не існує:', filename);
+    } else {
+      console.error('Помилка при видаленні файлу:', error);
+    }
+    throw error;
   }
 }
 
-function safeDecodeFromHex(hexString) {
-  const hexRegex = /^[0-9a-fA-F]*$/;
+// ! Приклад використання:
+// writeFileAsync('example.txt', 'Привіт, це тестовий файл!').then(() => {
+//   deleteFileAsync('example.txt')
+// })
 
-  if (typeof hexString !== 'string' || hexString.length === 0 || hexString.length % 2 !== 0 || !hexRegex.test(hexString)) {
-    console.error('Invalid hex string');
-    throw new Error('Invalid hex string');
-  }
-
-  try {
-    const decoded = decodeFromHex(hexString);
-    console.log('Safe Hex decoded result:', decoded);
-    return decoded;
-  } catch (error) {
-    console.error('Invalid hex string');
-    throw new Error('Invalid hex string');
-  }
-}
-
-/* ==========================================================
- *  Приклад використання (можна закоментувати/видалити)
- * ========================================================== */
-
-console.log('--- #1: isDebugMode ---');
-isDebugMode();
-
-console.log('\n--- #2: encode / decode ---');
-const base64Encoded = encodeToBase64('john@email.com', '123', 'extraData');
-console.log('Base64 Encoded:', base64Encoded);
-
-const hexEncoded = encodeToHex('john@email.com', '123', 'extraData');
-console.log('Hex Encoded:', hexEncoded);
-
-const base64Decoded = decodeFromBase64(base64Encoded);
-console.log('Base64 Decoded:', base64Decoded);
-
-const hexDecoded = decodeFromHex(hexEncoded);
-console.log('Hex Decoded:', hexDecoded);
-
-console.log('\n--- #3: safe decode (valid data) ---');
-const safeBase64Decoded = safeDecodeFromBase64(base64Encoded);
-console.log('Safe Base64 Decoded:', safeBase64Decoded);
-
-const safeHexDecoded = safeDecodeFromHex(hexEncoded);
-console.log('Safe Hex Decoded:', safeHexDecoded);
-
-console.log('\n--- #3: safe decode (invalid data) ---');
-try {
-  safeDecodeFromBase64('це не base64!!!');
-} catch (error) {
-  console.log('Caught expected error:', error.message);
-}
-
-try {
-  safeDecodeFromHex('zzz');
-} catch (error) {
-  console.log('Caught expected error:', error.message);
-}
+export { writeFileAsync, readFileAsync, deleteFileAsync };

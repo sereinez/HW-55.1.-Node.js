@@ -1,0 +1,25 @@
+{
+  "name": "321",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "type": "module",
+  "scripts": {
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/username/new-repo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/username/new-repo/issues"
+  },
+  "homepage": "https://github.com/username/new-repo#readme",
+  "devDependencies": {
+    "cross-env": "^10.1.0",
+    "jest": "^30.5.1"
+  }
+}
