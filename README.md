@@ -45,20 +45,7 @@ await deleteFileAsync('example.txt');
 - Усі помилки логуються, а потім прокидаються далі (`throw error`), щоб виклик функції отримав відхилений (`rejected`) проміс — це потрібно для коректного тестування через Jest (`await expect(fn()).rejects.toThrow()`).
 - `ENOENT` — стандартний код помилки Node.js, який означає "файл або шлях не знайдено".
 
-## Налаштування Jest (package.json)
 
-```json
-{
-  "type": "module",
-  "scripts": {
-    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest"
-  },
-  "devDependencies": {
-    "jest": "^30.5.1",
-    "cross-env": "^7.0.3"
-  }
-}
-```
 
 ## Запуск
 
